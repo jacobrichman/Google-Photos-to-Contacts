@@ -1,0 +1,19 @@
+{
+    "manifest_version": 2,
+    "name": "Google Photos People to Contacts",
+    "version": "1.0",
+    "description": "description",
+    "permissions": ["tabs", "http://*/*", "https://*/*"],
+    "content_scripts": [{
+      "js": ["script.js"],
+      "matches": ["https://photos.google.com/people"]
+    }],
+    "browser_action": {},
+    "background":{
+        "scripts": ["background.js"]
+    },
+    "icons": {
+      "48": "48.png",
+      "128": "128.png"
+    }
+}
