@@ -1,8 +1,8 @@
 {
     "manifest_version": 2,
-    "name": "Google Photos People to Contacts",
+    "name": "Google Photos to Contacts",
     "version": "1.0",
-    "description": "description",
+    "description": "Import your featured photos of people from Google Photos into Google Contacts.",
     "permissions": ["tabs", "http://*/*", "https://*/*"],
     "content_scripts": [{
       "js": ["script.js"],
