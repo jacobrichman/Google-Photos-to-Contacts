@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -39,7 +38,7 @@
           transition-timing-function: ease-in-out;
   padding: 0;
   margin-top: 4px;
-  width: 254px;
+  width: 190px;
     }
     .google-button__icon {
   display: inline-block;
@@ -58,11 +57,18 @@
 .google-button__text {
   display: inline-block;
   vertical-align: middle;
-  padding: 0 24px;
+  padding: 0 5px;
   font-size: 14px;
   font-weight: bold;
   font-family: 'Roboto',arial,sans-serif;
 }
+    .w3-third{
+      width: 25% !important;
+    }
+    .w3-disabled{
+      cursor: not-allowed;
+      pointer-events: none;
+    }
   </style>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 </head>
@@ -101,7 +107,7 @@
 </div>
 
 <div class="w3-third">
-  <div class="w3-card w3-container" style="min-height:460px">
+  <div  id="secondCard" class="w3-card w3-container" style="min-height:460px">
   <h3>Google Login</h3><br>
   <i class="fa fa-sign-in w3-margin-bottom w3-text-theme" style="font-size:120px"></i>
     <hr>
@@ -111,18 +117,32 @@
       </span>
       <span class="google-button__text">Sign in with Google</span>
     </button>
+    <div id="loggedInCreds"></div>
+  </div>
+</div>
+  
+<div class="w3-third">
+  <div class="w3-card w3-container" style="min-height:460px">
+  <h3>Find Matches</h3><br>
+  <i class="fa fa-arrows-alt w3-margin-bottom w3-text-theme" style="font-size:120px"></i>
+  <hr>
+  <button id="beginSearchButton" class="w3-button w3-theme-d3 w3-disabled">Begin Search</button> 
+    <br><br>
+  <div class="w3-light-gray">
+    <div id="mySearchBar" class="w3-center w3-padding w3-theme" style="display:none; width:0%;"></div>
+  </div>
   </div>
 </div>
 
 <div class="w3-third">
   <div class="w3-card w3-container" style="min-height:460px">
-  <h3>Upload Photos to Contacts</h3><br>
+  <h3>Upload Photos</h3><br>
   <i class="fa fa-upload w3-margin-bottom w3-text-theme" style="font-size:120px"></i>
   <hr>
-  <button class="w3-button w3-theme-d3 w3-disabled" onclick="move()">Begin Upload</button> 
+  <button id="beginUploadButton" class="w3-button w3-theme-d3 w3-disabled">Begin Upload</button> 
     <br><br>
-  <div style="display:none" class="w3-light-gray">
-    <div id="myBar" class="w3-center w3-padding w3-theme" style="width:5%">5%</div>
+  <div class="w3-light-gray">
+    <div id="myBar" class="w3-center w3-padding w3-theme" style="display:none; width:0%;"></div>
   </div>
   </div>
 </div>
@@ -164,30 +184,35 @@
 
 <!-- Script for Sidebar, Tabs, Accordions, Progress bars and slideshows -->
 <script>
-
-// Progress Bars
-function move(percent) {
-  var elem = document.getElementById("myBar");   
-  elem.style.width = percent + '%'; 
-  elem.innerHTML = percent * 1  + '%';
-}
-  
-  
   var timer;
-
   function checkLocalStorage(){
     var access_token = localStorage.getItem('access_token');
     if(access_token){
       clearInterval(timer);
+      loggedIn();
     }
   }
   
 $(document).ready(function(){
   $( "#googleSignInButton" ).click(function() {
-    var client_id = '1093367940800-n0pclmhlhpe9on7cn40vdfdhfsckisiq.apps.googleusercontent.com'
-    var url = "https://accounts.google.com/o/oauth2/v2/auth?client_id="+client_id+"&response_type=code&scope=https://www.google.com/m8/feeds&access_type=offline&redirect_uri=https://contactphotos.app/redirect.php";
-    window.open(url,'popUpWindow','height=700,width=500,left=50,top=20,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,status=yes')
-    timer= setInterval("checkLocalStorage()", 1000);
+    var client_id = '31446335233-mv1gr3dj67t37ke2t57a1qsvhqfcs9ph.apps.googleusercontent.com';
+    var refresh_token = localStorage.getItem('refresh_token');
+    if(refresh_token){
+      $.post( "https://www.googleapis.com/oauth2/v4/token", {
+        'refresh_token' : refresh_token,
+        'client_id' : client_id,
+        'client_secret' : 'hdriaIOzjJnxDS7rQvTaEBQK',
+        'grant_type' : 'refresh_token'
+      }).done(function( data ) {
+        localStorage.setItem('access_token', data['access_token']);
+        loggedIn();
+      });
+    }
+    else{
+      var url = "https://accounts.google.com/o/oauth2/v2/auth?client_id="+client_id+"&response_type=code&prompt=consent&scope=https://www.google.com/m8/feeds&access_type=offline&redirect_uri=https://contactphotos.app/redirect.php";
+      window.open(url,'popUpWindow','height=700,width=500,left=50,top=20,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,status=yes')
+      timer= setInterval("checkLocalStorage()", 1000);
+    }
   });
   
   if (data){
@@ -199,7 +224,7 @@ $(document).ready(function(){
     $("#googleSignInButton").removeClass("w3-disabled");
     var $table = $('#dataTable');
     for(var i = 0; i< data.length; i++){
-      $table.append('<tr id="table_' + i + '"><td>' + (i+1) + '</td><td>' + data[i]['name'] + '</td><td><img width="60" src="' + data[i]['url'] + '"></td></tr>');
+      $table.append('<tr id="table_' + i + '"><td>' + (i+1) + '</td><td>' + data[i]['name'] + '</td><td><img id="image_' + i +'" width="60" src="' + data[i]['url'] + '"></td></tr>');
     }
   }
   else{
@@ -207,11 +232,120 @@ $(document).ready(function(){
     $("#notDownloaded").show();
   }
   
-  $( "#googleSignInButton" ).click(function() {
-      var percent;
-      move(percent);
-      $("#table_3").addClass("w3-theme");
+  function loggedIn(){
+    $("#secondCard").addClass("w3-card-inv");
+    $("#googleSignInButton").addClass("w3-disabled");
+    $("#beginSearchButton").removeClass("w3-disabled");
+    $.ajax({
+      url: 'https://www.google.com/m8/feeds/contacts/default/full?access_token='+localStorage.getItem('access_token'),
+      type: 'GET', 
+      dataType: 'xml',
+      success: function(returnedXMLResponse){
+        $('feed', returnedXMLResponse).each(function(){
+          var name = $('name', $('author', this)).text();
+          var email = $('email', $('author', this)).text();
+          $("#loggedInCreds").html('<br><p>Logged in as <b>'+name+'</b><br>'+email+'</p>');
+        })
+      }
+    }); 
+  }
+  
+  $( "#beginSearchButton" ).click(function() {
+    $("#beginSearchButton").addClass("w3-disabled");
+    $("#mySearchBar").show();
+    for(var i = 0; i< data.length; i++){
+      getImageURL(i,data);
+    }
   });
+  
+  var numSearchDone = 0;
+  var numSearchGood = 0;
+  function getImageURL(i, data){
+    $.ajax({
+        url: 'https://www.google.com/m8/feeds/contacts/default/full?access_token='+localStorage.getItem('access_token')+'&q='+data[i]['name'],
+        type: 'GET', 
+        dataType: 'xml',
+        success: function(returnedXMLResponse){
+          $('feed', returnedXMLResponse).each(function(){
+            var uploadLink = jQuery($('link', $('entry', this)[0])[0]).attr('href');
+            if(uploadLink != "/favicon.ico"){
+              data[i]['uploadLink'] = uploadLink;
+
+              numSearchGood++;
+              var newval = Math.round((numSearchGood/data.length)*100)+'%';
+              $("#mySearchBar").html(newval);
+              $("#mySearchBar").css({'width': newval});
+            }
+            
+            numSearchDone++;
+            if(numSearchDone == data.length){
+              $("#beginUploadButton").removeClass("w3-disabled");
+            }
+          })
+        }
+      }); 
+  }
+  
+  var batchSize = 10;
+  $( "#beginUploadButton" ).click(function() {
+    $("#beginUploadButton").addClass("w3-disabled");
+    $("#myBar").show();
+    for(var p = 0; p<batchSize; p++){
+      if(data.length>p){uploadImage(data, p);}
+    }
+  });
+  
+  function uploadNext(data, i){
+    if(i+batchSize < data.length){
+      i=i+batchSize;
+      uploadImage(data, i);
+    }
+  }
+  
+  var numUploadDone=0;
+  function uploadImage(data,i){
+    if (!data[i]['uploadLink']) {
+      $("#table_"+i).css('background-color', 'red');
+      uploadNext(data, i);
+      
+      return;
+    }
+    $.ajax({
+      url: 'https://contactphotos.app/uploadImage.php', 
+      type: 'POST',
+      dataType: 'xml',
+      timeout: 3000,
+      data: {
+        'access_token' : localStorage.getItem('access_token'),
+        'newImageURL' : data[i]['url'],
+        'uploadLink' : data[i]['uploadLink']
+      },
+      complete: function(resultData) {
+        var updated = $(resultData.responseText).find('updated')[0];
+        if (updated){
+          $("#table_"+i).addClass("w3-theme");
+
+          numUploadDone++;
+          var newval = Math.round((numUploadDone/numSearchGood)*100)+'%';
+          $("#myBar").html(newval);
+          $("#myBar").css({'width': newval});
+          
+          if(numUploadDone==numSearchGood){
+            alert('Congratulations!!! Your upload to Google Contacts is complete.');
+            window.location.href = "https://contacts.google.com";
+          }
+          
+          uploadNext(data, i);
+        }
+        else{
+          $("#table_"+i).css('background-color', 'purple');
+          uploadImage(data, i);
+        }
+        
+       }
+    });
+
+  }
 
 });
 </script>
