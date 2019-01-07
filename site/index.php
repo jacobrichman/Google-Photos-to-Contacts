@@ -70,6 +70,7 @@
 <!-- Footer -->
 <footer class="w3-container w3-theme-dark w3-padding-16">
   <h3>Google Photos to Contacts</h3>
+  <a href="privacy.php">Privacy Policy</a>
 </footer>
 
 </body>

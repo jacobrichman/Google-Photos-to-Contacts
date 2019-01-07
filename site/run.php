@@ -78,6 +78,15 @@
       cursor: not-allowed;
       pointer-events: none;
     }
+    .img-container {
+      height: 60px;
+      width: 60px;
+      background-size: 70% !important;
+      background-size: cover !important;
+      border-radius:50% ;
+        background-position: center !important; 
+
+    }
   </style>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 </head>
@@ -127,6 +136,7 @@
       <span class="google-button__text">Sign in with Google</span>
     </button>
     <div id="loggedInCreds"></div>
+    <a id="logOut" style="display:none; cursor: pointer" ><u>Log Out</u></a> 
   </div>
 </div>
   
@@ -140,6 +150,7 @@
   <div class="w3-light-gray">
     <div id="mySearchBar" class="w3-center w3-padding w3-theme" style="display:none; width:0%;"></div>
   </div>
+    <div id="searchResults"></div>
   </div>
 </div>
 
@@ -193,8 +204,10 @@
 
 <!-- Script for Sidebar, Tabs, Accordions, Progress bars and slideshows -->
 <script>
+  
+$(document).ready(function(){
   var timer;
-  function checkLocalStorage(){
+  var checkLocalStorage = function (){
     var access_token = localStorage.getItem('access_token');
     if(access_token){
       clearInterval(timer);
@@ -202,9 +215,18 @@
     }
   }
   
-$(document).ready(function(){
+  $( "#logOut" ).click(function() {
+    $("#logOut").hide();
+    $("#secondCard").removeClass("w3-card-inv");
+    $("#googleSignInButton").removeClass("w3-disabled");
+    $("#beginSearchButton").addClass("w3-disabled");
+    $("#loggedInCreds").html('');
+    localStorage.setItem('access_token', '');
+    localStorage.setItem('refresh_token', '');
+  });
+  
   $( "#googleSignInButton" ).click(function() {
-    var client_id = '31446335233-mv1gr3dj67t37ke2t57a1qsvhqfcs9ph.apps.googleusercontent.com';
+    var client_id = '1093367940800-n0pclmhlhpe9on7cn40vdfdhfsckisiq.apps.googleusercontent.com';
     var refresh_token = localStorage.getItem('refresh_token');
     if(refresh_token){
       $.post( "https://www.googleapis.com/oauth2/v4/token", {
@@ -215,12 +237,15 @@ $(document).ready(function(){
       }).done(function( data ) {
         localStorage.setItem('access_token', data['access_token']);
         loggedIn();
+      }).fail(function( data ) {
+        $( "#logOut" ).click();
+        $( "#googleSignInButton" ).click();
       });
     }
     else{
       var url = "https://accounts.google.com/o/oauth2/v2/auth?client_id="+client_id+"&response_type=code&prompt=consent&scope=https://www.google.com/m8/feeds&access_type=offline&redirect_uri=https://contactphotos.app/redirect.php";
       window.open(url,'popUpWindow','height=700,width=500,left=50,top=20,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,status=yes')
-      timer= setInterval("checkLocalStorage()", 1000);
+      timer= setInterval(checkLocalStorage, 1000);
     }
   });
   
@@ -233,7 +258,7 @@ $(document).ready(function(){
     $("#googleSignInButton").removeClass("w3-disabled");
     var $table = $('#dataTable');
     for(var i = 0; i< data.length; i++){
-      $table.append('<tr id="table_' + i + '"><td>' + (i+1) + '</td><td>' + data[i]['name'] + '</td><td><img id="image_' + i +'" width="60" src="' + data[i]['url'] + '"></td></tr>');
+      $table.append('<tr id="table_' + i + '"><td>' + (i+1) + '</td><td>' + data[i]['name'] + '</td><td><div class="img-container" id="image_' + i +'" style="background: url(\'' + data[i]['url'] + '\') no-repeat bottom;"></div></td></tr>');
     }
   }
   else{
@@ -242,6 +267,7 @@ $(document).ready(function(){
   }
   
   function loggedIn(){
+    $("#logOut").show();
     $("#secondCard").addClass("w3-card-inv");
     $("#googleSignInButton").addClass("w3-disabled");
     $("#beginSearchButton").removeClass("w3-disabled");
@@ -285,12 +311,20 @@ $(document).ready(function(){
               $("#mySearchBar").html(newval);
               $("#mySearchBar").css({'width': newval});
             }
+            else{
+              $("#table_"+i).css('background-color', '#f45642');
+            }
             
             numSearchDone++;
             if(numSearchDone == data.length){
+              $("#searchResults").html(numSearchGood+ " People found in your contacts out of "+data.length+". Their rows are highlighted below.");
               $("#beginUploadButton").removeClass("w3-disabled");
             }
           })
+        },
+        error: function(res){
+          getImageURL(i, data);
+          console.log(res);
         }
       }); 
   }
@@ -314,7 +348,6 @@ $(document).ready(function(){
   var numUploadDone=0;
   function uploadImage(data,i){
     if (!data[i]['uploadLink']) {
-      $("#table_"+i).css('background-color', 'red');
       uploadNext(data, i);
       
       return;
@@ -347,7 +380,7 @@ $(document).ready(function(){
           uploadNext(data, i);
         }
         else{
-          $("#table_"+i).css('background-color', 'purple');
+          $("#table_"+i).css('background-color', '#b1ccc9');
           uploadImage(data, i);
         }
         
