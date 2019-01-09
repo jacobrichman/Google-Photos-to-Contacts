@@ -44,10 +44,10 @@
   <div class="w3-card w3-container" style="min-height:460px">
   <h3>Import</h3><br>
   <i class="fa fa-arrow-right w3-margin-bottom w3-text-theme" style="font-size:120px"></i>
-    <p>2) Install <a href="https://chrome.google.com/webstore/detail/pojngholjbkbkblepogbkphpheepjkeg/publish-review" target="_blank"> this</a> Chrome Extension,<br>
+    <p>2) Install <a href="https://chrome.google.com/webstore/detail/google-photos-to-contacts/pojngholjbkbkblepogbkphpheepjkeg" target="_blank"> this</a> Chrome Extension,<br>
       click on the icon<br>
       then click "Proceed".</p>
-        <a href="https://chrome.google.com/webstore/detail/pojngholjbkbkblepogbkphpheepjkeg/publish-review" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/8/87/Google_Chrome_icon_%282011%29.png" width="70"></img><b> Chrome Extension</b></a>
+        <a href="https://chrome.google.com/webstore/detail/google-photos-to-contacts/pojngholjbkbkblepogbkphpheepjkeg" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/8/87/Google_Chrome_icon_%282011%29.png" width="70"></img><b> Chrome Extension</b></a>
   </div>
 </div>
 
