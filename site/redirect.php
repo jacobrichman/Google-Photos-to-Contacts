@@ -4,8 +4,8 @@ $code = $_GET['code'];
 
 $fields = [
     'code' => $code,
-    'client_id' => '1093367940800-n0pclmhlhpe9on7cn40vdfdhfsckisiq.apps.googleusercontent.com',
-    'client_secret' => 'mW7tdkKZPD-4Woxs3fS2Z2vP',
+    'client_id' => '',
+    'client_secret' => '',
     'grant_type' => 'authorization_code',
     'redirect_uri' => 'https://contactphotos.app/redirect.php',  
 ];
