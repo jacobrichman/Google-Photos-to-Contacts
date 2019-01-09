@@ -226,7 +226,7 @@ $(document).ready(function(){
   });
   
   $( "#googleSignInButton" ).click(function() {
-    var client_id = '1093367940800-n0pclmhlhpe9on7cn40vdfdhfsckisiq.apps.googleusercontent.com';
+    var client_id = '';
     var refresh_token = localStorage.getItem('refresh_token');
     if(refresh_token){
       $.post( "https://www.googleapis.com/oauth2/v4/token", {
